@@ -2,24 +2,29 @@ package main
 
 import (
 	"flag"
-	"log"
-	"net/http"
 
 	"github.com/dekarti/ssu-gw/handlers"
-	"github.com/justinas/alice"
+	"github.com/docker/docker/client"
+	//	"github.com/labstack/echo"
+	//	"github.com/labstack/echo/middleware"
 )
 
 func main() {
-	var httpAddr = flag.String("http", "0.0.0.0:8080", "HTTP service address")
+	//var httpAddr = flag.String("http", "0.0.0.0:8080", "HTTP service address")
 	flag.Parse()
-	log.Println("Starting server...")
-	log.Printf("HTTP service listening on %s", *httpAddr)
 
-	mux := http.NewServeMux()
+	//e := echo.New()
+	//e.Use(middleware.Logger())
 
-	commonHandlers := alice.New(handlers.CommonHeadersHandler, handlers.LoggingHandler)
+	//e.GET("/hello", handlers.HelloHandler)
 
-	mux.Handle("/hello", commonHandlers.ThenFunc(http.HandlerFunc(handlers.HelloHandler)))
+	//e.Logger.Fatal(e.Start(*httpAddr))
 
-	log.Fatal(http.ListenAndServe(*httpAddr, mux))
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	handlers.RunContainer(cli)
+
 }

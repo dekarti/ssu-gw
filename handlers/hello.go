@@ -1,17 +1,18 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/labstack/echo"
 )
 
 type HelloResponse struct {
 	Message string `json:"message"`
 }
 
-func HelloHandler(w http.ResponseWriter, r *http.Request) {
+func HelloHandler(c echo.Context) error {
 	response := HelloResponse{
 		Message: "Hello",
 	}
-	json.NewEncoder(w).Encode(response)
+	return c.JSON(http.StatusOK, response)
 }
