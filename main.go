@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 
-	"github.com/dekarti/ssu-gw/handlers"
+	// "github.com/dekarti/ssu-gw/handlers"
+	"github.com/dekarti/ssu-gw/models"
 	"github.com/docker/docker/client"
 	//	"github.com/labstack/echo"
 	//	"github.com/labstack/echo/middleware"
@@ -25,6 +26,21 @@ func main() {
 		panic(err)
 	}
 
-	handlers.RunContainer(cli)
+	task1 := &models.Task{
+		Name:           "task 1",
+		Description:    "Task 1",
+		DefaultInput:   "",
+		ExpectedOutput: "",
+	}
+
+	work1 := &models.Work{
+		DockerClient: cli,
+		Task:         task1,
+		Path:         "/Users/aarutyunyan/Desktop/ssu-fl/tasks",
+		Command:      []string{"python", "exp_nfa.py"},
+	}
+	work1.LaunchWork()
+
+	//	handlers.RunContainer(cli)
 
 }
