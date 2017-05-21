@@ -1,41 +1,47 @@
 package handlers
 
 import (
-	"context"
-	"fmt"
 	"net/http"
-	"time"
+	"strconv"
 
 	"github.com/dekarti/ssu-gw/common"
 	"github.com/dekarti/ssu-gw/models"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	//	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/client"
+	"github.com/dekarti/ssu-gw/util"
 	"github.com/labstack/echo"
 )
 
-const (
-	VOLUME_PATH string = "/Users/aarutyunyan/Projects/study/ssu-fl/tasks"
-	WORKING_DIR string = "/usr/src/myapp"
+type (
+	TestUnit struct {
+		Input    string `json:"input"`
+		Output   string `json:"output"`
+		Result   string `json:"result"`
+		Expected string `json:"expected"`
+	}
 )
 
-//func HelloHandler(c echo.Context) error {
-//	response := HelloResponse{
-//		Message: "Hello",
-//	}
-//	return c.JSON(http.StatusOK, response)
-//}
-
+// POST /task/:id/work/launch
 func LaunchWorkHandler(c echo.Context) error {
+	taskNumber, _ := strconv.Atoi(c.Param("id"))
+
 	work := &models.Work{
 		DockerClient: common.CLI,
-		Task:         models.Task1,
+		Task:         models.Tasks[taskNumber],
 		Path:         "/Users/aarutyunyan/Desktop/ssu-fl/tasks",
 		Command:      []string{"python", "exp_nfa.py"},
 	}
 
-	if err := work.WriteInput(models.Task1.DefaultInput); err != nil {
+	testUnit := &TestUnit{}
+
+	if err := c.Bind(testUnit); err != nil {
+		return err
+	}
+
+	if testUnit.Input == "" {
+		testUnit.Input = models.Tasks[taskNumber].DefaultInput
+		testUnit.Expected = models.Tasks[taskNumber].ExpectedOutput
+	}
+
+	if err := work.WriteInput(testUnit.Input); err != nil {
 		return err
 	}
 
@@ -43,54 +49,23 @@ func LaunchWorkHandler(c echo.Context) error {
 		return err
 	}
 
+	if err := util.IsContainerSuccessfullyExited(work.ContainerName, 5); err != nil {
+		return err
+	}
+
 	if output, err := work.ReadOutput(); err != nil {
 		return err
-	} else if output != models.Task1.ExpectedOutput {
-		return c.JSON(http.StatusBadRequest, struct {
-			Message  string
-			Input    string
-			Output   string
-			Expected string
-		}{
-			Message:  "doesn't match",
-			Input:    models.Task1.DefaultInput,
-			Output:   output,
-			Expected: models.Task1.ExpectedOutput,
-		})
 	} else {
-		return c.JSON(http.StatusOK, struct {
-			Message  string
-			Input    string
-			Output   string
-			Expected string
-		}{
-			Message:  "ok",
-			Input:    models.Task1.DefaultInput,
-			Output:   output,
-			Expected: models.Task1.ExpectedOutput,
-		})
+		testUnit.Output = output
+		if testUnit.Expected != "" {
+			if output == testUnit.Expected {
+				testUnit.Result = "Output matches expected value"
+				return c.JSON(http.StatusOK, testUnit)
+			} else {
+				testUnit.Result = "Output doesn't match expected value"
+				return c.JSON(http.StatusBadRequest, testUnit)
+			}
+		}
+		return c.JSON(http.StatusOK, testUnit)
 	}
-}
-
-func RunContainer(cli *client.Client) (*container.ContainerCreateCreatedBody, error) {
-	response, err := cli.ContainerCreate(context.Background(),
-		&container.Config{
-			Cmd:        []string{"python", "exp_nfa.py"},
-			Image:      "python:2.7-slim",
-			WorkingDir: WORKING_DIR,
-		},
-		&container.HostConfig{
-			Mounts: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: VOLUME_PATH,
-					Target: WORKING_DIR,
-				},
-			},
-		}, nil, fmt.Sprintf("my-container-%d", time.Now().Unix()))
-
-	if err != nil {
-		return nil, err
-	}
-	return &response, nil
 }

@@ -6,8 +6,15 @@ import (
 	"os"
 	"testing"
 
+	"github.com/dekarti/ssu-gw/common"
+	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(m *testing.M) {
+	common.CLI, _ = client.NewEnvClient()
+	os.Exit(m.Run())
+}
 
 func TestWriteInput(t *testing.T) {
 	work := &Work{

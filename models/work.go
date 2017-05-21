@@ -1,32 +1,30 @@
 package models
 
 import (
-	"archive/zip"
 	"bufio"
-	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/dekarti/ssu-gw/util"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
 const (
 	WORKING_DIR string = "/usr/src/myapp"
+	TIMEOUT     int    = 5
 )
 
 type Work struct {
-	DockerClient *client.Client
-	Task         *Task
-	Path         string
-	Input        string
-	Output       string
-	Command      []string
+	DockerClient  *client.Client
+	ContainerName string
+	Task          *Task
+	Path          string
+	Input         string
+	Output        string
+	Command       []string
 }
 
 func (w *Work) WriteInput(s string) error {
@@ -71,7 +69,7 @@ func (w *Work) Validate() error {
 func (w *Work) LaunchWork() error {
 	containerName := fmt.Sprintf("work-%d-%d", w.Task.Number, time.Now().Unix())
 
-	_, err := w.DockerClient.ContainerCreate(context.Background(),
+	if err := util.RunContainer(w.DockerClient,
 		&container.Config{
 			Cmd:        w.Command,
 			Image:      "python:2.7-slim",
@@ -79,52 +77,10 @@ func (w *Work) LaunchWork() error {
 		},
 		&container.HostConfig{
 			Binds: []string{fmt.Sprintf("%s:%s", w.Path, "/usr/src/myapp")},
-		}, nil, containerName)
-
-	if err != nil {
+		}, containerName); err != nil {
 		return err
 	}
 
-	if err := w.DockerClient.ContainerStart(context.Background(), containerName, types.ContainerStartOptions{}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Unzip(archive, target string) error {
-	reader, err := zip.OpenReader(archive)
-	if err != nil {
-		return err
-	}
-
-	if err := os.Mkdir(target, 0755); err != nil {
-		return err
-	}
-
-	for _, file := range reader.File {
-		path := filepath.Join(target, file.Name)
-		if file.FileInfo().IsDir() {
-			os.MkdirAll(path, file.Mode())
-			continue
-		}
-
-		fileReader, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer fileReader.Close()
-
-		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
-		if err != nil {
-			return err
-		}
-		defer targetFile.Close()
-
-		if _, err := io.Copy(targetFile, fileReader); err != nil {
-			return err
-		}
-	}
-
+	w.ContainerName = containerName
 	return nil
 }
