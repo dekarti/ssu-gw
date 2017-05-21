@@ -2,9 +2,11 @@ package models
 
 import (
 	"archive/zip"
+	"bufio"
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -27,7 +29,30 @@ type Work struct {
 	Command      []string
 }
 
-func (w Work) Validate() error {
+func (w *Work) WriteInput(s string) error {
+	f, err := os.Create(fmt.Sprintf("%s/input.txt", w.Path))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writer := bufio.NewWriter(f)
+	_, err = writer.WriteString(s)
+	writer.Flush()
+	return err
+}
+
+func (w *Work) ReadInput() (string, error) {
+	b, err := ioutil.ReadFile(fmt.Sprintf("%s/input.txt", w.Path))
+	return string(b), err
+}
+
+func (w *Work) ReadOutput() (string, error) {
+	b, err := ioutil.ReadFile(fmt.Sprintf("%s/output.txt", w.Path))
+	return string(b), err
+}
+
+func (w *Work) Validate() error {
 	// Setup
 	// if err := Unzip(w.Path); err != nil {
 	//	return err
@@ -43,7 +68,7 @@ func (w Work) Validate() error {
 
 }
 
-func (w Work) LaunchWork() error {
+func (w *Work) LaunchWork() error {
 	containerName := fmt.Sprintf("work-%d-%d", w.Task.Number, time.Now().Unix())
 
 	_, err := w.DockerClient.ContainerCreate(context.Background(),
