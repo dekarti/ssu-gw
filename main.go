@@ -23,6 +23,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 
+	e.Static("/", "public")
 	e.POST("/task/:id/launch", handlers.LaunchWorkHandler)
 
 	e.Logger.Fatal(e.Start(*httpAddr))
