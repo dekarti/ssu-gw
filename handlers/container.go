@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/dekarti/ssu-gw/common"
 	"github.com/dekarti/ssu-gw/models"
 	"github.com/dekarti/ssu-gw/util"
 	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
 )
 
 type (
@@ -18,6 +22,34 @@ type (
 		Expected string `json:"expected"`
 	}
 )
+
+// POST /upload
+func UploadHandler(c echo.Context) error {
+	log.Info("Upload requested")
+	file, err := c.FormFile("file")
+	if err != nil {
+		log.Fatal(err)
+	}
+	src, err := file.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer src.Close()
+
+	// Destination
+	dst, err := os.Create(file.Filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dst.Close()
+
+	// Copy
+	if _, err = io.Copy(dst, src); err != nil {
+		log.Fatal(err)
+	}
+
+	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully.</p>", file.Filename))
+}
 
 // POST /task/:id/work/launch
 func LaunchWorkHandler(c echo.Context) error {

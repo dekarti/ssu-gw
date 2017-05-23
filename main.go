@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 )
 
 func main() {
@@ -22,9 +23,11 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.Logger())
+	e.Logger.SetLevel(log.INFO)
 
 	e.Static("/", "public")
 	e.POST("/task/:id/launch", handlers.LaunchWorkHandler)
+	e.POST("/upload", handlers.UploadHandler)
 
 	e.Logger.Fatal(e.Start(*httpAddr))
 }

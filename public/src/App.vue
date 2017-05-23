@@ -16,15 +16,31 @@
       <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
+    <input ref="uploadfile" type="file" @change="upload">
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'app',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  methods: {
+    upload: function(e) {
+      e.preventDefault() ;
+      var files = this.$refs.uploadfile.files;
+      var data = new FormData();
+      data.append('file', files[0]);
+      axios.post('/upload', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
     }
   }
 }

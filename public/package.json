@@ -1,5 +1,5 @@
 {
-  "name": "ssu-gw-frontend",
+  "name": "ssu-gw",
   "description": "A Vue.js project",
   "version": "1.0.0",
   "author": "Arsen Arutyunyan",
@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "vue": "^2.2.1"
   },
   "devDependencies": {
