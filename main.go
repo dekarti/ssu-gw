@@ -22,8 +22,10 @@ func main() {
 	flag.Parse()
 
 	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Logger.SetLevel(log.INFO)
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
+	e.Logger.SetLevel(log.DEBUG)
 
 	e.Static("/", "public")
 	e.POST("/task/:id/launch", handlers.LaunchWorkHandler)

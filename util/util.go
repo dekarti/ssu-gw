@@ -56,7 +56,10 @@ func Unzip(archive, target string) error {
 		return err
 	}
 
-	if err := os.Mkdir(target, 0755); err != nil {
+	switch err := os.Mkdir(target, 0755); {
+	case os.IsExist(err):
+		break
+	case err != nil:
 		return err
 	}
 

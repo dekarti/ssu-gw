@@ -51,3 +51,7 @@ func TestIsContainerSuccessfullyExited(t *testing.T) {
 		defer common.CLI.ContainerRemove(context.Background(), name, types.ContainerRemoveOptions{Force: true})
 	}
 }
+
+func TestUnzip(t *testing.T) {
+	// TODO
+}

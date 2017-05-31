@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	_ "strings"
+	"time"
 
 	"github.com/dekarti/ssu-gw/common"
 	"github.com/dekarti/ssu-gw/models"
@@ -25,7 +27,10 @@ type (
 
 // POST /upload
 func UploadHandler(c echo.Context) error {
-	log.Info("Upload requested")
+	form, err := c.MultipartForm()
+	for k, _ := range form.File {
+		log.Debug(k)
+	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		log.Fatal(err)
@@ -37,14 +42,24 @@ func UploadHandler(c echo.Context) error {
 	defer src.Close()
 
 	// Destination
-	dst, err := os.Create(file.Filename)
+	// TODO: Generate work dir depending on work parameters
+	//	 Now it uses timestamp.
+	workDir := fmt.Sprintf("work_%d", time.Now().Unix())
+	dstDir := fmt.Sprintf("%s/%s", common.BASE_DIR, workDir)
+	os.Mkdir(dstDir, 0755)
+	dst, err := os.Create(fmt.Sprintf("%s/%s", dstDir, file.Filename))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer dst.Close()
 
 	// Copy
+
 	if _, err = io.Copy(dst, src); err != nil {
+		log.Fatal(err)
+	}
+
+	if err = util.Unzip(dst.Name(), dstDir); err != nil {
 		log.Fatal(err)
 	}
 
