@@ -1,77 +1,60 @@
 <template>
-    <div class="form-main">
-        <div class="form-field">
-            <form-input
-                    type="text"
-                    label="Task name"
-                    :value="name"
-                    placeholder="Finite machine">
-            </form-input>
-        </div>
-        <div class="form-container">
-            <div class="form-area">
-                <label class="form-label">Description</label>
-                <div>
-                    <textarea cols="45"
-                              rows="20"
-                              class="form-input"
-                              placeholder="# Task 1"
-                              @input="update">{{ description }}</textarea>
-                </div>
-            </div>
-            <div class="form-area">
-                <label class="form-label">Formatted Description</label>
-                <div v-html="compiledMarkdown"></div>
-            </div>
-        </div>
+    <div class="main">
+        <div class="header"></div>
 
-        <hr/>
-
-        <div class="form-container">
-            <div class="form-container__part">
-                <div>
-                    <label class="form-label">Test Input</label>
-                </div>
-                <div class="form-area">
-                    <div>
-                        <textarea cols="45"
-                                  rows="20"
-                                  class="form-input">{{ defaultInput }}</textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="form-container__part">
-                <div>
-                    <label class="form-label">Expected Output</label>
-                </div>
-                <div class="form-area">
-                    <div>
-                        <textarea cols="45"
-                                  rows="20"
-                                  class="form-input">{{ expectedOutput }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="button">
-                <button @click="add">Launch</button>
         <div>
-    </div>
-<!--        <div class="form-item">
-            <label class="form-label">Task name</label>
-            <input class="form-input" v-model="name" type="text" placeholder="Finite machine" />
+            <small class="text-muted">Enter task name</small>
+            <div class="row">
+                <div class="col-sm-8">
+                    <b-form-input v-model="name"
+                                  type="text"
+                                  placeholder="Finite machine"></b-form-input>
+                </div>
+                <div class="col-sm-4">
+                    <b-button variant="primary" @click="add">Add</b-button>
+                </div>
+            </div>
+
+            <br/>
         </div>
-        <div class="editor">
-            <label class="form-label">Raw Description</label>
-            <textarea :value="description" @input="update"></textarea>
+
+        <div>
+            <div class="block">
+                <small class="text-muted">Enter task description (Markdown is available for formatting)</small>
+                <b-form-input class="area"
+                              textarea
+                              v-model="description"
+                              type="text"
+                              placeholder="# Task 1"></b-form-input>
+            </div>
+
+            <div class="block">
+                <small class="text-muted">Formatted description</small>
+                <div class="area" v-html="compiledMarkdown"></div>
+            </div>
         </div>
-        <div class="editor">
-            <label class="form-label">Input</label>
-            <textarea v-model="defaultInput"></textarea>
+
+        <br/>
+
+        <div>
+            <div class="block">
+                <small class="text-muted">Input</small>
+                <b-form-input class="area"
+                              textarea
+                              v-model="defaultInput"
+                              type="text"></b-form-input>
+            </div>
+            <div class="block">
+                <small class="text-muted">Expected Output</small>
+                <b-form-input class="area"
+                              textarea
+                              v-model="expectedOutput"
+                              type="text"></b-form-input>
+            </div>
         </div>
-        <div class="editor">
-            <label class="form-label">Output</label>
-            <textarea v-model="expectedOutput"></textarea>
+
+<!--        <div>
+            <button @click="add">Launch</button>
         </div>-->
     </div>
 </template>
@@ -84,16 +67,20 @@
 
     export default {
         components: { FormInput, FormTextArea },
+        props: {
+            'tasks': Array
+        },
         data() {
             return {
                 name: '',
                 description: '',
                 defaultInput: '',
-                expectedOutput: ''
+                expectedOutput: '',
+                submitted: false
             }
         },
         computed: {
-            tasks() {
+/*            tasks() {
                 return [
                     {
                         id: "1",
@@ -111,7 +98,7 @@
                         description: 'Parser'
                     }
                 ]
-            },
+            },*/
             compiledMarkdown: function () {
                 return marked(this.description, {sanitize: true})
             }
@@ -120,58 +107,39 @@
             update: _.debounce(function (e) {
                     this.description = e.target.value
             }, 300),
-            add() {
 
+            add() {
+                this.tasks.push({
+                    id: toString(tasks.length + 1) ,
+                    name: this.name,
+                    description: this.description
+                })
             }
         }
     }
 </script>
 
 <style>
-    @import "~variables/variables.scss";
-    @import "~variables/media-queries.scss";
-
-    .form-field {
-        width: 70%;
-        margin-top: 10px;
-        margin-bottom: 40px;
-    }
-    .form-main {
-        width: 100%;
-        margin-left: 10px;
-        margin-right: 10px;
+    .main {
+        float: left;
     }
 
-    .form-container {
+    .form {
+       width: 700px;
+    }
+    .header {
         width: 100%;
+        height: 15px;
+    }
+
+    .block {
+        width: 400px;
         height: 300px;
-    }
-    .form-container__part {
         float: left;
-        width: 40%;
-        height: 90%;
+        margin-right: 50px;
     }
-    .form-area {
-        width: 50%;
-        height: 100%;
-        float: left;
-    }
-    .button {
-        height: 36px;
-        line-height: 32px;
-        background: none;
-        padding: 0 1rem;
-        overflow: visible;
-        border-radius: 5px;
-        margin-left: 1rem;
-        letter-spacing: 1px;
-        @include font-size(13);
-        color: $color-disabled;
-        text-transform: uppercase;
-        border: 2px solid $color-border;
-        font-weight: $font-weight-semibold;
-        @include transition (all 0.12s linear);
-        float: right;
+    .area {
+        width: 300px;
+        height: 250px;
     }
 </style>
-
