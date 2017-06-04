@@ -1,6 +1,6 @@
 <template>
     <div class="navigation">
-        <b-nav vertical=true pills>
+        <b-nav vertical pills>
     <!--        <router-link :to="{name: 'home'}">
                 <img src="~assets/logo.png">
             </router-link>-->
@@ -15,27 +15,14 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+
     export default {
         computed: {
-            tasks(){
-                return [
-                    {
-                        id: "1",
-                        name: 'Task 1',
-                        description: 'Exponential number'
-                    },
-                    {
-                        id: "2",
-                        name: 'Task 2',
-                        description: 'Lexer'
-                    },
-                    {
-                        id: "3",
-                        name: 'Task 3',
-                        description: 'Parser'
-                    }
-                ]
-            }
+            ...mapGetters([
+                'tasks',
+                'taskCount'
+            ]),
         },
         methods: {
             toggleNav(){
@@ -47,9 +34,4 @@
 </script>
 
 <style>
-    .navigation {
-        float: left;
-        padding: 20px;
-        width: 250px;
-    }
 </style>

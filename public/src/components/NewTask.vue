@@ -18,8 +18,8 @@
             <br/>
         </div>
 
-        <div>
-            <div class="block">
+        <div class="row">
+            <div class="col-md-6">
                 <small class="text-muted">Enter task description (Markdown is available for formatting)</small>
                 <b-form-input class="area"
                               textarea
@@ -28,7 +28,7 @@
                               placeholder="# Task 1"></b-form-input>
             </div>
 
-            <div class="block">
+            <div class="col-md-6">
                 <small class="text-muted">Formatted description</small>
                 <div class="area" v-html="compiledMarkdown"></div>
             </div>
@@ -36,15 +36,15 @@
 
         <br/>
 
-        <div>
-            <div class="block">
+        <div class="row">
+            <div class="col-md-6">
                 <small class="text-muted">Input</small>
                 <b-form-input class="area"
                               textarea
                               v-model="defaultInput"
                               type="text"></b-form-input>
             </div>
-            <div class="block">
+            <div class="col-md-6">
                 <small class="text-muted">Expected Output</small>
                 <b-form-input class="area"
                               textarea
@@ -64,12 +64,11 @@
     import marked from 'marked';
     import FormInput from './FormInput.vue'
     import FormTextArea from './FormTextArea.vue'
+    import { mapGetters } from 'vuex'
+
 
     export default {
         components: { FormInput, FormTextArea },
-        props: {
-            'tasks': Array
-        },
         data() {
             return {
                 name: '',
@@ -80,25 +79,10 @@
             }
         },
         computed: {
-/*            tasks() {
-                return [
-                    {
-                        id: "1",
-                        name: 'Task 1',
-                        description: 'Exponential number'
-                    },
-                    {
-                        id: "2",
-                        name: 'Task 2',
-                        description: 'Lexer'
-                    },
-                    {
-                        id: "3",
-                        name: 'Task 3',
-                        description: 'Parser'
-                    }
-                ]
-            },*/
+            ...mapGetters([
+                'tasks',
+                'taskCount'
+            ]),
             compiledMarkdown: function () {
                 return marked(this.description, {sanitize: true})
             }
@@ -109,10 +93,11 @@
             }, 300),
 
             add() {
-                this.tasks.push({
-                    id: toString(tasks.length + 1) ,
+                let newId = this.taskCount + 1;
+                this.$store.commit('addTask',{
+                    id: newId.toString(),
                     name: this.name,
-                    description: this.description
+                    description: this.compiledMarkdown
                 })
             }
         }
@@ -120,7 +105,7 @@
 </script>
 
 <style>
-    .main {
+/*    .main {
         float: left;
     }
 
@@ -141,5 +126,8 @@
     .area {
         width: 300px;
         height: 250px;
-    }
+    }*/
+.area {
+    height: 250px;
+}
 </style>

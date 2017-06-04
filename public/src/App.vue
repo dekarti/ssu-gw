@@ -1,14 +1,18 @@
 <template>
     <div id="app">
-        <navigation></navigation>
-        <header class="header"></header>
-<!--        <textarea cols="40" rows="15" charswidth="23" v-model="input"></textarea>
-        <textarea cols="40" rows="15" charswidth="23" v-model="output"></textarea>
-        <input ref="uploadfile" type="file" @change="upload">
-        <button @click="launch">Launch</button>-->
-        <section class="main">
-            <router-view></router-view>
-        </section>
+        <div class="row">
+            <div class="col-md-3">
+                <navigation></navigation>
+            </div>
+    <!--        <textarea cols="40" rows="15" charswidth="23" v-model="input"></textarea>
+            <textarea cols="40" rows="15" charswidth="23" v-model="output"></textarea>
+            <input ref="uploadfile" type="file" @change="upload">
+            <button @click="launch">Launch</button>-->
+            <div class="col-md-9">
+                <router-view></router-view>
+            </div>
+            <!--<input ref="uploadfile" type="file" @change="upload"> -->
+        </div>
     </div>
 </template>
 
@@ -69,7 +73,4 @@ export default {
 </script>
 
 <style>
-    .main {
-        float: left;
-    }
 </style>

@@ -7,6 +7,8 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+
     export default {
 
         props: ['type', 'label', 'error', 'value', 'message', 'placeholder'],
