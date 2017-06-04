@@ -64,7 +64,7 @@
     import marked from 'marked';
     import FormInput from './FormInput.vue'
     import FormTextArea from './FormTextArea.vue'
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
 
 
     export default {
@@ -93,11 +93,11 @@
             }, 300),
 
             add() {
-                let newId = this.taskCount + 1;
-                this.$store.commit('addTask',{
-                    id: newId.toString(),
+                this.$store.dispatch('addTask', {
                     name: this.name,
-                    description: this.compiledMarkdown
+                    description: this.compiledMarkdown,
+                    defaultInput: this.defaultInput,
+                    expectedOutput: this.expectedOutput
                 })
             }
         }

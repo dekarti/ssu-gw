@@ -68,6 +68,9 @@ export default {
                     console.log(error);
                 });
         }
+    },
+    created() {
+        this.$store.dispatch('fetchTasks')
     }
 }
 </script>

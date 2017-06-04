@@ -1,34 +1,33 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        tasks: [
-            {
-                id: "1",
-                name: 'Task 1',
-                description: 'Exponential number'
-            },
-            {
-                id: "2",
-                name: 'Task 2',
-                description: 'Lexer'
-            },
-            {
-                id: "3",
-                name: 'Task 3',
-                description: 'Parser'
-            }
-        ]
+        tasks: []
     },
     actions: {
-
+        fetchTasks ({ commit }) {
+            axios.get("/tasks")
+                .then((response) => {
+                    commit('setTasks', response.data.tasks)
+                })
+        },
+        addTask ({ commit }, task) {
+            axios.post("/tasks", task)
+                .then((response) => {
+                    commit('addTask', response.data)
+                });
+        }
     },
     mutations: {
         addTask (state, task) {
             state.tasks.push(task)
+        },
+        setTasks (state, tasks) {
+            state.tasks = tasks
         }
     },
     getters: {
