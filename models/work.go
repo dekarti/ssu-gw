@@ -67,7 +67,7 @@ func (w *Work) Validate() error {
 }
 
 func (w *Work) LaunchWork() error {
-	containerName := fmt.Sprintf("work-%d-%d", w.Task.Number, time.Now().Unix())
+	containerName := fmt.Sprintf("work-%d-%d", w.Task.Id, time.Now().Unix())
 
 	if err := util.RunContainer(w.DockerClient,
 		&container.Config{

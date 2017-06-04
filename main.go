@@ -28,8 +28,10 @@ func main() {
 	e.Logger.SetLevel(log.DEBUG)
 
 	e.Static("/", "public")
-	e.POST("/task/:id/launch", handlers.LaunchWorkHandler)
 	e.POST("/upload", handlers.UploadHandler)
+	e.POST("/tasks/:id/launch", handlers.LaunchWorkHandler)
+	e.POST("/tasks", handlers.CreateTaskHandler)
+	e.GET("/tasks", handlers.GetTasksHandler)
 
 	e.Logger.Fatal(e.Start(*httpAddr))
 }
