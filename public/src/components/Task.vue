@@ -13,6 +13,28 @@
                 <b-button variant="primary" @click="launch">Launch</b-button>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <small class="text-muted">Command to execute</small>
+                <b-form-input v-model="command"
+                              type="text"
+                              placeholder="python main.py"></b-form-input>
+            </div>
+            <div class="col-sm-3">
+                <small class="text-muted">Language</small>
+                <b-form-input v-model="language"
+                              type="text"
+                              placeholder="python"></b-form-input>
+            </div>
+            <div class="col-sm-3">
+                <small class="text-muted">Version</small>
+                <b-form-input v-model="version"
+                              type="text"
+                              placeholder="2.7"></b-form-input>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6">
                 <small class="text-muted">Input</small>
@@ -41,8 +63,12 @@
         data() {
             return {
                 file: null,
+                command: '',
+                language: '',
+                version: '',
                 input: '',
                 output: '',
+                path: '',
                 isUploaded: false
             }
         },
@@ -63,10 +89,26 @@
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
+                }).then((resp) => {
+                    this.path = resp.data.path;
                 });
             },
             launch() {
-                console.log("Launched")
+                let data = {
+                    task: this.task,
+                    config: {
+                        command: this.command.split(" "),
+                        language: this.language,
+                        version: this.version
+                    },
+                    input: this.input,
+                    path: this.path
+                };
+                axios.post('/tasks/launch', data)
+                    .then((resp) => {
+                        this.output = resp.data.output;
+                        this.input = resp.data.input;
+                    });
             }
         }
     }

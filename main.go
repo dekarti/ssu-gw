@@ -29,7 +29,7 @@ func main() {
 
 	e.Static("/", "public")
 	e.POST("/upload", handlers.UploadHandler)
-	e.POST("/tasks/:id/launch", handlers.LaunchWorkHandler)
+	e.POST("/tasks/launch", handlers.LaunchWorkHandler)
 	e.POST("/tasks", handlers.CreateTaskHandler)
 	e.GET("/tasks", handlers.GetTasksHandler)
 

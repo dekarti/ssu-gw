@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
+	_ "strconv"
 	_ "strings"
 	"time"
 
@@ -14,15 +14,6 @@ import (
 	"github.com/dekarti/ssu-gw/util"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
-)
-
-type (
-	TestUnit struct {
-		Input    string `json:"input"`
-		Output   string `json:"output"`
-		Result   string `json:"result"`
-		Expected string `json:"expected"`
-	}
 )
 
 // POST /upload
@@ -63,32 +54,28 @@ func UploadHandler(c echo.Context) error {
 		log.Fatal(err)
 	}
 
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully.</p>", file.Filename))
+	return c.JSON(http.StatusOK, struct {
+		WorkPath string `json:"path"`
+	}{
+		dstDir,
+	})
 }
 
-// POST /task/:id/work/launch
+// POST /work/launch
 func LaunchWorkHandler(c echo.Context) error {
-	taskNumber, _ := strconv.Atoi(c.Param("id"))
-
-	work := &models.Work{
-		DockerClient: common.CLI,
-		Task:         models.Tasks[taskNumber],
-		Path:         "/Users/aarutyunyan/Desktop/ssu-fl/tasks",
-		Command:      []string{"python", "exp_nfa.py"},
-	}
-
-	testUnit := &TestUnit{}
-
-	if err := c.Bind(testUnit); err != nil {
+	//uaskNumber, _ := strconv.Atoi(c.Param("id"))
+	work := &models.Work{}
+	if err := c.Bind(work); err != nil {
 		return err
 	}
 
-	if testUnit.Input == "" {
-		testUnit.Input = models.Tasks[taskNumber].DefaultInput
-		testUnit.Expected = models.Tasks[taskNumber].ExpectedOutput
+	log.Debugf("binded")
+
+	if work.Input == "" {
+		work.Input = work.Task.DefaultInput
 	}
 
-	if err := work.WriteInput(testUnit.Input); err != nil {
+	if err := work.WriteInput(work.Input); err != nil {
 		return err
 	}
 
@@ -103,8 +90,9 @@ func LaunchWorkHandler(c echo.Context) error {
 	if output, err := work.ReadOutput(); err != nil {
 		return err
 	} else {
-		testUnit.Output = output
-		if testUnit.Expected != "" {
+		work.Output = output
+		/*
+		if work.Expected != "" {
 			if output == testUnit.Expected {
 				testUnit.Result = "Output matches expected value"
 				return c.JSON(http.StatusOK, testUnit)
@@ -112,7 +100,7 @@ func LaunchWorkHandler(c echo.Context) error {
 				testUnit.Result = "Output doesn't match expected value"
 				return c.JSON(http.StatusBadRequest, testUnit)
 			}
-		}
-		return c.JSON(http.StatusOK, testUnit)
+		}*/
+		return c.JSON(http.StatusOK, work)
 	}
 }
