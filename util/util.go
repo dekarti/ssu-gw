@@ -16,6 +16,33 @@ import (
 	"github.com/docker/docker/client"
 )
 
+func PullDockerImage(name string) (io.ReadCloser, error) {
+	if reader, err := common.CLI.ImagePull(context.Background(), name, types.ImagePullOptions{}); err != nil {
+		return nil, err
+	} else {
+		return reader, nil
+	}
+}
+
+func SearchDockerImage(name string) ([]string, error) {
+	images, err := common.CLI.ImageSearch(context.Background(), name, types.ImageSearchOptions{
+		Limit: 10,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result := []string{}
+	for _, image := range images {
+		imageName := image.Name
+		if image.IsOfficial {
+			imageName = fmt.Sprintf("library/%s", image.Name)
+		}
+		result = append(result, imageName)
+	}
+	return result, nil
+}
+
 func IsContainerSuccessfullyExited(name string, timeout int) error {
 	containerInfo, err := common.CLI.ContainerInspect(context.Background(), name)
 	for ; timeout > 0; timeout-- {
@@ -24,7 +51,6 @@ func IsContainerSuccessfullyExited(name string, timeout int) error {
 			return err
 		}
 
-		fmt.Printf("status: %s", containerInfo.State.Status)
 		if containerInfo.State.Status == "exited" {
 			if containerInfo.State.ExitCode != 0 {
 				return errors.New(fmt.Sprintf("Process exited with code %d", containerInfo.State.ExitCode))

@@ -84,7 +84,7 @@ func LaunchWorkHandler(c echo.Context) error {
 	}
 
 	if err := util.IsContainerSuccessfullyExited(work.ContainerName, 5); err != nil {
-		return err
+		c.JSON(http.StatusBadRequest, err)
 	}
 
 	if output, err := work.ReadOutput(); err != nil {
