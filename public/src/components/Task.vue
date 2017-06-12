@@ -23,15 +23,17 @@
             </div>
             <div class="col-sm-3">
                 <small class="text-muted">Language</small>
-                <b-form-input v-model="language"
-                              type="text"
-                              placeholder="python"></b-form-input>
+                <select class="col-sm-12" style="height: 37px" v-model="language">
+                    <option disabled value="">Please select one</option>
+                    <option v-for="image in images">{{ image.name }}</option>
+                </select>
             </div>
             <div class="col-sm-3">
                 <small class="text-muted">Version</small>
-                <b-form-input v-model="version"
-                              type="text"
-                              placeholder="2.7"></b-form-input>
+                <select class="col-sm-12" style="height: 37px" v-model="version">
+                    <option disabled value="">Please select one</option>
+                    <option v-for="tag in currentImage.tags">{{ tag }}</option>
+                </select>
             </div>
         </div>
 
@@ -69,17 +71,19 @@
                 input: '',
                 output: '',
                 path: '',
-                isUploaded: false
+                isUploaded: false,
+                currentImage: {}
             }
         },
         computed: {
             ...mapGetters([
                     'tasks',
-                    'taskCount'
+                    'taskCount',
+                    'images'
             ]),
-            task(){
+            task() {
                 return this.$store.getters.getTaskById(this.id)
-            }
+            },
         },
         methods: {
             upload() {
@@ -110,7 +114,17 @@
                         this.input = resp.data.input;
                     });
             }
+        },
+        watch: {
+            language: function() {
+                for (var i in this.images) {
+                    if (this.images[i].name === this.language) {
+                        this.currentImage = this.images[i]
+                    }
+                }
+            }
         }
+
     }
 </script>
 

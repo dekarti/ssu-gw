@@ -42,6 +42,19 @@ func TestPullDockerImage(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSearchDockerImageTags(t *testing.T) {
+	tags, err := SearchDockerImageTags("java")
+	assert.NoError(t, err)
+	t.Logf("%v", tags)
+	assert.NotEmpty(t, tags)
+}
+
+func TestListAvailableDockerImages(t *testing.T) {
+	images, err := ListAvailableDockerImages()
+	assert.NoError(t, err)
+	t.Logf("%v", images)
+}
+
 func TestIsContainerSuccessfullyExited(t *testing.T) {
 	testtable := []struct {
 		In       string

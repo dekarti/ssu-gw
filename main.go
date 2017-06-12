@@ -32,6 +32,7 @@ func main() {
 	e.POST("/tasks/launch", handlers.LaunchWorkHandler)
 	e.POST("/tasks", handlers.CreateTaskHandler)
 	e.GET("/tasks", handlers.GetTasksHandler)
+	e.GET("/images", handlers.GetImagesHandler)
 
 	e.Logger.Fatal(e.Start(*httpAddr))
 }

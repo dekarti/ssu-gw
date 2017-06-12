@@ -70,7 +70,8 @@ export default {
         }
     },
     created() {
-        this.$store.dispatch('fetchTasks')
+        this.$store.dispatch('fetchTasks');
+        this.$store.dispatch('fetchImages')
     }
 }
 </script>

@@ -6,13 +6,41 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        tasks: []
+        tasks: [
+            {
+                id: 1,
+                name: "task1",
+                description: "Alo"
+            }
+        ],
+        images: [
+            {
+                name: "python",
+                tags: [
+                    "2.7",
+                    "2.7-slim"
+                ]
+            },
+            {
+                name: "java",
+                tags: [
+                    "7",
+                    "8"
+                ]
+            }
+        ]
     },
     actions: {
         fetchTasks ({ commit }) {
             axios.get("/tasks")
                 .then((response) => {
                     commit('setTasks', response.data.tasks)
+                })
+        },
+        fetchImages ({ commit }) {
+            axios.get("/images")
+                .then((response) => {
+                    commit('setImages', response.data.images)
                 })
         },
         addTask ({ commit }, task) {
@@ -28,6 +56,9 @@ const store = new Vuex.Store({
         },
         setTasks (state, tasks) {
             state.tasks = tasks
+        },
+        setImages (state, images) {
+            state.images = images
         }
     },
     getters: {
@@ -39,6 +70,12 @@ const store = new Vuex.Store({
             },
             taskCount: state => {
                 return state.tasks.length
+            },
+            images: state => {
+                return state.images
+            },
+            filterImagesByName: (state) => (name) => {
+                return state.images.find(x => x.name.startWith(name))
             }
     }
 });

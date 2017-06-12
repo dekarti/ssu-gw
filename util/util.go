@@ -9,11 +9,16 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	"net/http"
+	"encoding/json"
+	"io/ioutil"
+	"strings"
 
 	"github.com/dekarti/ssu-gw/common"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/api/types/filters"
 )
 
 func PullDockerImage(name string) (io.ReadCloser, error) {
@@ -34,13 +39,74 @@ func SearchDockerImage(name string) ([]string, error) {
 
 	result := []string{}
 	for _, image := range images {
-		imageName := image.Name
-		if image.IsOfficial {
-			imageName = fmt.Sprintf("library/%s", image.Name)
-		}
-		result = append(result, imageName)
+		result = append(result, image.Name)
 	}
 	return result, nil
+}
+
+func SearchDockerImageTags(name string) ([]string, error) {
+	absoluteName := fmt.Sprintf("library/%s", name)
+	if strings.Contains(name, "/") {
+		absoluteName = name
+	}
+
+	next := fmt.Sprintf("https://registry.hub.docker.com/v2/repositories/%s/tags/", absoluteName)
+	result := []string{}
+	for next != "" {
+		resp, err := http.Get(next)
+		if err != nil {
+			return nil, err
+		}
+
+		responseData, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		tags := struct {
+			Next    string
+			Results []struct {
+				Name string `json:"name"`
+			} `json:"results"`
+		}{}
+
+		if err := json.Unmarshal(responseData, &tags); err != nil {
+			return nil, err
+		}
+
+		for _, tag := range tags.Results {
+			result = append(result, tag.Name)
+		}
+		next = tags.Next
+	}
+	return result, nil
+}
+
+func ListAvailableDockerImages() (map[string][]string, error) {
+	filterArgs := filters.NewArgs()
+	filterArgs.Add("dangling", "false")
+	images, err := common.CLI.ImageList(context.Background(), types.ImageListOptions{
+		Filters: filterArgs,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	imageMap := map[string][]string{}
+	for _, image := range images {
+		for _, imageName := range image.RepoTags {
+			tmp := strings.Split(imageName, ":")
+			imagePrefix := tmp[0]
+			imageSuffix := tmp[1:]
+			if _, ok := imageMap[imagePrefix]; ok {
+				imageMap[imagePrefix] = append(imageMap[imagePrefix], imageSuffix...)
+			} else {
+				imageMap[imagePrefix] = imageSuffix
+			}
+		}
+	}
+
+	return imageMap, nil
 }
 
 func IsContainerSuccessfullyExited(name string, timeout int) error {
