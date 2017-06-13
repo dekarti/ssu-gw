@@ -34,8 +34,8 @@ export default {
     methods: {
         upload: function (e) {
             e.preventDefault();
-            var files = this.$refs.uploadfile.files;
-            var data = new FormData();
+            let files = this.$refs.uploadfile.files;
+            let data = new FormData();
             data.append('file', files[0]);
             axios.post('/upload', data, {
                 headers: {

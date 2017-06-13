@@ -62,13 +62,10 @@
 <script>
     import _ from 'underscore';
     import marked from 'marked';
-    import FormInput from './FormInput.vue'
-    import FormTextArea from './FormTextArea.vue'
     import { mapGetters, mapActions } from 'vuex'
 
 
     export default {
-        components: { FormInput, FormTextArea },
         data() {
             return {
                 name: '',
