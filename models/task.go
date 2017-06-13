@@ -14,21 +14,21 @@ var (
 	Tasks = []*Task{
 		{
 			Id:		123456,
-			Name:           "task 1",
-			Description:    "Task 1",
+			Name:           "Task 1",
+			Description:    "Determine if number is floating",
 			DefaultInput:   "1e2\nf\n1e-3",
 			ExpectedOutput: "True\nFalse\nTrue",
 		},
 		{
 			Id:		123457,
-			Name:           "task 1",
+			Name:           "Task 2",
 			Description:    "Task 1",
 			DefaultInput:   "1e2\nf\n1e-3",
 			ExpectedOutput: "True\nFalse\nTrue",
 		},
 		{
 			Id:		123458,
-			Name:           "task 1",
+			Name:           "Task 3",
 			Description:    "Task 1",
 			DefaultInput:   "1e2\nf\n1e-3",
 			ExpectedOutput: "True\nFalse\nTrue",
