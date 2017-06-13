@@ -10,7 +10,7 @@ const store = new Vuex.Store({
             {
                 id: 1,
                 name: "task1",
-                description: "Alo"
+                description: "task1"
             }
         ],
         images: [

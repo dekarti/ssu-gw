@@ -1,9 +1,6 @@
 <template>
     <div class="navigation">
         <b-nav vertical pills>
-    <!--        <router-link :to="{name: 'home'}">
-                <img src="~assets/logo.png">
-            </router-link>-->
             <b-nav-item>
                 <router-link class="nav__link" :tasks=tasks :to="{name: 'new'}">New Task</router-link>
             </b-nav-item>
@@ -32,6 +29,3 @@
         },
     }
 </script>
-
-<style>
-</style>

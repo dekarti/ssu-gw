@@ -102,28 +102,6 @@
 </script>
 
 <style>
-/*    .main {
-        float: left;
-    }
-
-    .form {
-       width: 700px;
-    }
-    .header {
-        width: 100%;
-        height: 15px;
-    }
-
-    .block {
-        width: 400px;
-        height: 300px;
-        float: left;
-        margin-right: 50px;
-    }
-    .area {
-        width: 300px;
-        height: 250px;
-    }*/
 .area {
     height: 250px;
 }
