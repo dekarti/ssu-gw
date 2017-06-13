@@ -29,7 +29,7 @@ func PullDockerImage(name string) (io.ReadCloser, error) {
 	}
 }
 
-func SearchDockerImage(name string) ([]string, error) {
+func SearchDockerImage(name string, official bool) ([]string, error) {
 	images, err := common.CLI.ImageSearch(context.Background(), name, types.ImageSearchOptions{
 		Limit: 10,
 	})
@@ -39,12 +39,18 @@ func SearchDockerImage(name string) ([]string, error) {
 
 	result := []string{}
 	for _, image := range images {
+		if official {
+			if image.IsOfficial {
+				result = append(result, image.Name)
+			}
+			continue
+		}
 		result = append(result, image.Name)
 	}
 	return result, nil
 }
 
-func SearchDockerImageTags(name string) ([]string, error) {
+func ListDockerImageTags(name string) ([]string, error) {
 	absoluteName := fmt.Sprintf("library/%s", name)
 	if strings.Contains(name, "/") {
 		absoluteName = name

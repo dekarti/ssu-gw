@@ -33,6 +33,10 @@ func main() {
 	e.POST("/tasks", handlers.CreateTaskHandler)
 	e.GET("/tasks", handlers.GetTasksHandler)
 	e.GET("/images", handlers.GetImagesHandler)
+	e.GET("/images/search", handlers.SearchImageHandler)
+	e.GET("/images/:name/tags", handlers.ListImageTagsHandler)
+	e.GET("/images/:nameprefix/:namesuffix/tags", handlers.ListImageTagsHandler)
+	e.GET("/images/pull", handlers.PullImageHandler)
 
 	e.Logger.Fatal(e.Start(*httpAddr))
 }
