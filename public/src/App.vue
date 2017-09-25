@@ -40,13 +40,12 @@ export default {
         },
         launch: function (e) {
             e.preventDefault();
-            self = this;
             axios.post('/task/' + this.currentTask + '/launch', {
-                input: this.input
+                input: this.input,
             })
-                .then(function (response) {
+                .then((response) => {
                     console.log(response);
-                    var escapedResponse = JSON
+                    const escapedResponse = JSON
                         .stringify(response)
                         .replace(/\\n/g, "\\n")
                         .replace(/\\'/g, "\\'")
@@ -56,7 +55,7 @@ export default {
                         .replace(/\\t/g, "\\t")
                         .replace(/\\b/g, "\\b")
                         .replace(/\\f/g, "\\f");
-                    self.output = JSON.parse(escapedResponse).data.output;
+                    this.output = JSON.parse(escapedResponse).data.output;
                     console.log(response);
                 })
                 .catch(function (error) {
